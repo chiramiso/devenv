@@ -1,0 +1,81 @@
+###############################################################
+# Multi-Language Dockerfile Template
+# This Dockerfile can be used as a base for Ruby, Python, or Node.js (with TypeScript) projects.
+# Uncomment the relevant section for your desired language setup.
+###############################################################
+
+# ------------------------
+# Base Image Selection
+# ------------------------
+FROM debian:latest
+# Uncomment the appropriate line for your project:
+
+# For Ruby projects
+# FROM ruby:latest
+
+# For Python projects
+# FROM python:latest
+
+# For Node.js projects (includes TypeScript support)
+# FROM node:latest
+
+# ------------------------
+# Common Setup
+# ------------------------
+# Update package list and install common tools
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /code
+
+# ------------------------
+# Ruby Setup
+# ------------------------
+# Uncomment if using Ruby
+# COPY Gemfile* ./
+# RUN gem install bundler && \
+#     bundle install
+
+# ------------------------
+# Python Setup
+# ------------------------
+# Uncomment if using Python
+# COPY requirements.txt ./
+# RUN pip install --upgrade pip && \
+#     pip install -r requirements.txt
+
+# ------------------------
+# Node.js & TypeScript Setup
+# ------------------------
+# Uncomment if using Node.js
+# COPY package*.json ./
+# RUN npm install && \
+#     npm install -g typescript
+
+# ------------------------
+# Copy Project Files
+# ------------------------
+COPY . ./
+
+# ------------------------
+# Default Command
+# ------------------------
+# Set the default command for the container. Modify as needed.
+# CMD ["ruby", "./source/main.rb"]   # For Ruby
+# CMD ["python", "./source/main.py"] # For Python
+# CMD ["npm", "start"]               # For Node.js
+
+# ------------------------
+# Expose Ports (if needed)
+# ------------------------
+# Expose a port if your application runs on a specific port
+# EXPOSE 3000 # Default port, modify as per your application
+
+###############################################################
+# End of Dockerfile
+###############################################################

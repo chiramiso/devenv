@@ -1,0 +1,72 @@
+#---------------------------------------
+# General
+#---------------------------------------
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+*.swn
+*.bak
+*.backup
+*.temp
+
+# Environment files
+.env
+.env.*
+
+# Git and version control
+.git
+.gitignore
+
+# Node modules and package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# Ruby artifacts
+.bundle/
+log/
+tmp/
+*.gem
+*.rbc
+db/*.sqlite3
+db/*.sqlite3-journal
+.byebug_history
+config/master.key
+
+# IDE configurations
+.vscode/
+.idea/
+*.iml
+
+# Docker-related files (if generated during build)
+Dockerfile*
+.dockerignore
+
+# Coverage and testing output
+coverage/
+*.lcov
+test-results/
+
+# Ignore generated documentation
+docs/
+
+# Ignore local scripts if not needed in container
+scripts/
