@@ -42,7 +42,7 @@ This creates the following structure in `~/Code/new-app/`, including starter scr
 
 ### 2. Set Up Project Symlinks
 
-Run the setup script to create symlinks for all projects in the parent directory:
+Run the setup script to create symlinks for all or some projects in the parent directory:
 
 ```bash
 make setup
