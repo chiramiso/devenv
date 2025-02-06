@@ -139,9 +139,9 @@ link-%:
 		echo "Error: Please specify the path to the project using 'path=path/to/project'"; \
 		exit 1; \
 	fi;
-	/bin/mkdir -p projects
-	/bin/ln -sfn $(PATH) projects/$*
-	echo "Linked project '$*' to $(PATH)"
+	@mkdir -p projects
+	@/bin/ln -sfn $(PATH) projects/$*
+	@echo "==> Linked project '$*' to $(PATH)"
 
 # Run the link_projects.sh script to set up project symlinks
 setup:
@@ -164,4 +164,5 @@ init-%:
 	echo "#!/bin/bash\necho 'Running tests for $*...'" > $(CODE_DIR)/$*/scripts/test.sh
 	echo "#!/bin/bash\necho 'Linting $* source code...'" > $(CODE_DIR)/$*/scripts/lint.sh
 	chmod +x $(CODE_DIR)/$*/scripts/*.sh
-	echo "==> Project '$*' initialized. Customize the Dockerfile and scripts as needed."
+	ln -sfn $(CODE_DIR)/$* projects/$*
+	@echo "==> Project '$*' initialized. Customize the Dockerfile and scripts as needed."
