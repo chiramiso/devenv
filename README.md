@@ -14,7 +14,7 @@
   |    ├─ templates/         # Templates for new projects
   │    ├─ Dockerfile         # Common development container
   │    └─ Makefile           # Controls building & running
-  ├─ new-app/                   # Example project
+  ├─ new-app/                # Example project
        ├─ Dockerfile         # Project-specific Dockerfile
        ├─ Makefile           # Project-specific Makefile (optional)
        ├─ .env               # Environment variables
@@ -248,4 +248,3 @@ MIT License
 ---
 
 Happy hacking! 🚀
-
