@@ -5,7 +5,7 @@ PRIMARY_TARGETS := build rebuild shell start stop logs test lint clean_volumes i
 CODE_DIR := $(shell dirname $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 # Get the current working directory
-DEVENV_PATH := $(pwd)
+DEVENV_PATH := $(shell pwd)
 
 # If second argument exists and is not a primary target, use it as project name
 ifeq ($(filter $(word 2,$(MAKECMDGOALS)),$(PRIMARY_TARGETS)),)
@@ -21,7 +21,7 @@ endif
 
 # Ensure PROJECT is set
 ifneq ($(PROJECT),)
-  PROJECT_DIR=$(CODE_DIR)/projects/$(PROJECT)
+  PROJECT_DIR=$(DEVENV_PATH)/projects/$(PROJECT)
 else
   $(error PROJECT is not set. Please provide a project name as the second argument.)
 endif
@@ -46,10 +46,10 @@ build:
 	@$(MAKE) build-$(PROJECT) --no-print-directory
 
 build-%:
-	@echo "==> Building base image for project '$*' using Dockerfile in $(CODE_DIR)/$*"
-	docker build -t $*-base $(CODE_DIR)/$*
-	@echo "==> Building dev image for project '$*' using common Dockerfile in $(CODE_DIR)/devenv"
-	docker build --build-arg BASE_IMAGE=$*-base -t $*-dev $(CODE_DIR)/$*
+	@echo "==> Building base image for project '$*' using Dockerfile in $(PROJECT_DIR)"
+	docker build -t $*-base $(PROJECT_DIR)
+	@echo "==> Building dev image for project '$*' using common Dockerfile in $(DEVENV_PATH)"
+	docker build --build-arg BASE_IMAGE=$*-base -t $*-dev $(PROJECT_DIR)
 
 ### Rebuild images without using cache
 rebuild:
@@ -57,9 +57,9 @@ rebuild:
 
 rebuild-%:
 	@echo "==> Rebuilding base image for project '$*' with no cache"
-	docker build --no-cache -t $*-base $(CODE_DIR)/$*
+	docker build --no-cache -t $*-base $(PROJECT_DIR)
 	@echo "==> Rebuilding dev image for project '$*' with no cache"
-	docker build --no-cache --build-arg BASE_IMAGE=$*-base -t $*-dev $(CODE_DIR)/$*
+	docker build --no-cache --build-arg BASE_IMAGE=$*-base -t $*-dev $(PROJECT_DIR)
 
 ### Run an interactive shell in the container
 shell:
