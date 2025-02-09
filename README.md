@@ -9,9 +9,9 @@
 ```
 ~/Code/
   ├─ devenv/
-  |    ├─ projects/          # Contains symlinks to the projects
-  |    ├─ scripts/           # Common scripts
-  |    ├─ templates/         # Templates for new projects
+  │    ├─ projects/          # Contains symlinks to the projects
+  │    ├─ scripts/           # Common scripts
+  │    ├─ templates/         # Templates for new projects
   │    ├─ Dockerfile         # Common development container
   │    └─ Makefile           # Controls building & running
   ├─ new-app/                # Example project
@@ -46,6 +46,12 @@ Run the setup script to create symlinks for all or some projects in the parent d
 
 ```bash
 make setup
+```
+
+Alternatively, you can link a specific project manually:
+
+```bash
+make link new-app path=/path/to/new-app
 ```
 
 ### 3. Build the Project
@@ -216,6 +222,7 @@ CMD ["/bin/bash"]
 - **init**: Initialize a new project structure.
 - **purge**: Purge all Docker containers and images related to the project.
 - **setup**: Set up project symlinks.
+- **link**: Create a symlink for a specific project.
 
 ### Project-Specific Targets
 
@@ -230,6 +237,7 @@ CMD ["/bin/bash"]
 - **clean_volumes-%**: Clean volumes for a specific project.
 - **purge-%**: Purge all containers and images for a specific project.
 - **init-%**: Initialize a new project structure for a specific project.
+- **link-%**: Create a symlink for a specific project.
 
 ---
 

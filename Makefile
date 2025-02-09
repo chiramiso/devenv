@@ -49,7 +49,7 @@ build-%:
 	@echo "==> Building base image for project '$*' using Dockerfile in $(CODE_DIR)/$*"
 	docker build -t $*-base $(CODE_DIR)/$*
 	@echo "==> Building dev image for project '$*' using common Dockerfile in $(CODE_DIR)/devenv"
-	docker build --build-arg BASE_IMAGE=$*-base -t $*-dev .
+	docker build --build-arg BASE_IMAGE=$*-base -t $*-dev $(CODE_DIR)/$*
 
 ### Rebuild images without using cache
 rebuild:
@@ -59,7 +59,7 @@ rebuild-%:
 	@echo "==> Rebuilding base image for project '$*' with no cache"
 	docker build --no-cache -t $*-base $(CODE_DIR)/$*
 	@echo "==> Rebuilding dev image for project '$*' with no cache"
-	docker build --no-cache --build-arg BASE_IMAGE=$*-base -t $*-dev .
+	docker build --no-cache --build-arg BASE_IMAGE=$*-base -t $*-dev $(CODE_DIR)/$*
 
 ### Run an interactive shell in the container
 shell:
