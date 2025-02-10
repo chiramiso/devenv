@@ -2,7 +2,17 @@
 
 ## Overview
 
-**Devenv** is a flexible, Docker-based development environment that allows you to manage multiple programming projects without installing languages or tools directly on your machine. Each project has its own Dockerfile for specific dependencies while sharing a common development container for tools like Vim, Tmux, and Git. A centralized Makefile streamlines commands for building, running, and managing projects.
+**Devenv** is a Docker-based development environment designed to provide an isolated yet flexible workspace for software development. It enables a consistent setup across multiple projects while maintaining separate dependencies and configurations per project. It allows you to manage multiple programming projects without installing languages or tools directly on your machine.
+
+This setup consists of:
+*	A shared development container with essential tools such as Vim, Tmux, Git, and others.
+*	Per-project Dockerfiles that define project-specific dependencies and language runtimes.
+*	A docker-compose setup to manage the shared development environment efficiently.
+*	A centralized Makefile for easy management of build, run, and project operations.
+
+## Disclaimer
+
+This setup reflects my personal development workflow and is tailored toward my projects involving Ruby, Python, and Node.js/TypeScript. While it may be useful for others, it is opinionated and optimized for my use cases. Feel free to adapt it to suit your own development needs.
 
 ## Directory Structure
 
@@ -302,21 +312,6 @@ CMD ["/bin/bash"]
 - **down**: Stop and remove all containers defined in a Docker Compose setup.
 - **tap**: Access an interactive shell in a running container.
 - **taplog**: View live logs of a running container.
-
-### Project-Specific Targets
-
-- **build-%**: Build the base and development Docker images for a specific project.
-- **rebuild-%**: Rebuild the base and development Docker images for a specific project without using the cache.
-- **shell-%**: Start an interactive shell for a specific project.
-- **start-%**: Start the container for a specific project in detached mode.
-- **stop-%**: Stop the running container for a specific project.
-- **logs-%**: View logs for a specific project's container.
-- **test-%**: Run tests for a specific project.
-- **lint-%**: Run linter for a specific project.
-- **clean_volumes-%**: Clean volumes for a specific project.
-- **purge-%**: Purge all containers and images for a specific project.
-- **init-%**: Initialize a new project structure for a specific project.
-- **link-%**: Create a symlink for a specific project.
 
 ---
 
