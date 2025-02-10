@@ -26,18 +26,31 @@ else
   $(error PROJECT is not set. Please provide a project name as the second argument.)
 endif
 
+# Function to read environment variables from .env file
+define read_env
+$(shell if [ -f $(1) ]; then grep -v '^#' $(1) | xargs -0 printf '%b\n' 2>/dev/null; fi)
+endef
+
+# Function to extract port mappings from environment variables
+define get_port_mappings
+$(shell if [ -f $(1) ]; then grep '_PORT=' $(1) | sed 's/.*=\(.*\)/\1:\1/'; fi)
+endef
+
 # Default docker options (adjust if needed)
 DOCKER_RUN_OPTS = -v $(PROJECT_DIR):/code
 ENV_FILE=$(PROJECT_DIR)/.env
 
 # Include environment file if present
 ifneq (,$(wildcard $(ENV_FILE)))
-  DOCKER_RUN_OPTS += --env-file $(ENV_FILE)
+  # Read all environment variables from .env file
+  ENV_VARS := $(call read_env,$(ENV_FILE))
+  # Add each environment variable to docker run options
+  DOCKER_RUN_OPTS += $(foreach var,$(ENV_VARS),--env $(var))
+  # Get all port mappings from variables ending with _PORT
+  PORT_MAPPINGS := $(call get_port_mappings,$(ENV_FILE))
+  # Add each port mapping to docker run options
+  DOCKER_RUN_OPTS += $(foreach port,$(PORT_MAPPINGS),-p $(port))
 endif
-
-# Default port (can be overridden)
-PORT ?= 3000
-DOCKER_RUN_OPTS += -p $(PORT):$(PORT)
 
 .PHONY: $(PRIMARY_TARGETS)
 
@@ -75,6 +88,9 @@ start:
 
 start-%:
 	@echo "==> Starting container for project '$*' in detached mode"
+	@if [ ! -f "$(PROJECT_DIR)/.env" ]; then \
+		echo "Warning: No .env file found at $(PROJECT_DIR)/.env"; \
+	fi
 	docker run -d $(DOCKER_RUN_OPTS) --name $*-dev-container $*-dev bash /code/scripts/start.sh
 
 ### Stop the running container
