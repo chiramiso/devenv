@@ -4,6 +4,10 @@ services:
   project1:
     build: ../../projects/project1
     container_name: project1
+    env_file:
+      - .env
+    environment:
+      - API_KEY=${API_KEY}
     volumes:
       - ../../projects/project1:/app
     networks:
