@@ -29,6 +29,7 @@ Icon?                 # macOS custom folder attributes
 #---------------------------------------
 .vscode/
 .history/
+*.code-workspace
 
 #---------------------------------------
 # Node.js
