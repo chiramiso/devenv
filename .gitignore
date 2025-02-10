@@ -9,6 +9,12 @@
 projects/*
 !projects/.keep
 
+# Ignore everything in docker-setups except .keep file
+# and example-setup folder
+docker-setups/*
+!docker-setups/.keep
+!docker-setups/example-*
+
 # OS-specific files
 .DS_Store             # macOS
 Thumbs.db             # Windows

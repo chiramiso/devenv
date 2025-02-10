@@ -1,5 +1,5 @@
 # List of “primary” targets that do not refer to a project name
-PRIMARY_TARGETS := build rebuild shell start stop logs test lint clean_volumes init purge setup link
+PRIMARY_TARGETS := build rebuild shell start stop logs test lint clean_volumes init purge setup link up down tap taplog
 
 # Set the CODE_DIR to the parent directory. This assumes that all the projects are in the same parent directory.
 CODE_DIR := $(shell dirname $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST)))))
@@ -182,3 +182,65 @@ init-%:
 	chmod +x $(CODE_DIR)/$*/scripts/*.sh
 	ln -sfn $(CODE_DIR)/$* projects/$*
 	@echo "==> Project '$*' initialized. Customize the Dockerfile and scripts as needed."
+
+### Run docker-compose up for a specific setup
+up:
+	@if [ -z "$(word 2,$(MAKECMDGOALS))" ]; then \
+		echo "Error: Please specify a setup name (e.g., make up setup-name)"; \
+		exit 1; \
+	fi
+	@SETUP_NAME=$(word 2,$(MAKECMDGOALS)); \
+	COMPOSE_FILE="docker-setups/$$SETUP_NAME/docker-compose.yml"; \
+	if [ ! -f "$$COMPOSE_FILE" ]; then \
+		echo "Error: docker-compose.yml not found at $$COMPOSE_FILE"; \
+		exit 1; \
+	fi; \
+	echo "==> Starting docker-compose setup '$$SETUP_NAME'"; \
+	docker-compose -f $$COMPOSE_FILE up -d
+	
+### Run docker-compose down for a specific setup
+down:
+	@if [ -z "$(word 2,$(MAKECMDGOALS))" ]; then \
+		echo "Error: Please specify a setup name (e.g., make down setup-name)"; \
+		exit 1; \
+	fi
+	@SETUP_NAME=$(word 2,$(MAKECMDGOALS)); \
+	COMPOSE_FILE="docker-setups/$$SETUP_NAME/docker-compose.yml"; \
+	if [ ! -f "$$COMPOSE_FILE" ]; then \
+		echo "Error: docker-compose.yml not found at $$COMPOSE_FILE"; \
+		exit 1; \
+	fi; \
+	echo "==> Stopping docker-compose setup '$$SETUP_NAME'"; \
+	docker-compose -f $$COMPOSE_FILE down
+
+### Connect to a running container
+tap:
+	@if [ -z "$(word 2,$(MAKECMDGOALS))" ]; then \
+		echo "Error: Please specify a container name (e.g., make tap container-name)"; \
+		exit 1; \
+	fi
+	@CONTAINER_NAME=$(word 2,$(MAKECMDGOALS)); \
+	if ! docker ps --format '{{.Names}}' | grep -q "^$$CONTAINER_NAME$$"; then \
+		echo "Error: Container '$$CONTAINER_NAME' is not running"; \
+		exit 1; \
+	fi; \
+	echo "==> Connecting to container '$$CONTAINER_NAME'"; \
+	docker exec -it $$CONTAINER_NAME /bin/bash || docker exec -it $$CONTAINER_NAME /bin/sh
+
+### View logs of a running container
+taplog:
+	@if [ -z "$(word 2,$(MAKECMDGOALS))" ]; then \
+		echo "Error: Please specify a container name (e.g., make taplog container-name)"; \
+		exit 1; \
+	fi
+	@CONTAINER_NAME=$(word 2,$(MAKECMDGOALS)); \
+	if ! docker ps --format '{{.Names}}' | grep -q "^$$CONTAINER_NAME$$"; then \
+		echo "Error: Container '$$CONTAINER_NAME' is not running"; \
+		exit 1; \
+	fi; \
+	echo "==> Viewing logs for container '$$CONTAINER_NAME'"; \
+	docker logs -f $$CONTAINER_NAME
+
+# Make catch-all rule to handle the setup name argument
+%:
+	@:

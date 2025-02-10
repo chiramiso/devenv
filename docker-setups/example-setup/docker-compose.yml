@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  project1:
+    build: ../../projects/project1
+    container_name: project1
+    volumes:
+      - ../../projects/project1:/app
+    networks:
+      - dev_network
+
+  project2:
+    build: ../../projects/project2
+    container_name: project2
+    volumes:
+      - ../../projects/project2:/app
+    networks:
+      - dev_network
+
+networks:
+  dev_network:

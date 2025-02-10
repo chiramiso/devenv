@@ -9,6 +9,9 @@
 ```
 ~/Code/
   ├─ devenv/
+  |    ├─ docker-setups/          # Docker Compose setups
+  |    |    ├─ example-setup/     # Example multi-container setup
+  |    |         └─ docker-compose.yml
   │    ├─ projects/          # Contains symlinks to the projects
   │    ├─ scripts/           # Common scripts
   │    ├─ templates/         # Templates for new projects
@@ -123,6 +126,78 @@ make purge new-app
 
 ---
 
+## Docker Compose Setups
+
+The `docker-setups/` directory contains Docker Compose configurations for multi-container applications. Each setup is organized in its own subdirectory:
+
+```
+docker-setups/
+├── example-setup/         # Example multi-container setup
+│   └── docker-compose.yml
+└── my-mighty-app/         # my-mighty-app integration setup
+    └── docker-compose.yml
+```
+
+### Managing Docker Compose Setups
+
+#### Starting a Setup
+```bash
+make up setup-name
+# Example: make up my-mighty-app
+```
+This command starts all containers defined in `docker-setups/setup-name/docker-compose.yml` in detached mode.
+
+#### Stopping a Setup
+```bash
+make down setup-name
+# Example: make down my-mighty-app
+```
+This command stops and removes all containers defined in the setup's docker-compose file, but preserves volumes.
+
+### Container Interaction Commands
+
+#### Accessing Container Shell
+```bash
+make tap container-name
+# Example: make tap my-mighty-app
+```
+Opens an interactive shell in a running container. Will try `/bin/bash` first, then fall back to `/bin/sh`.
+
+#### Viewing Container Logs
+```bash
+make taplog container-name
+# Example: make taplog my-mighty-app
+```
+Shows the live logs of a running container in follow mode.
+
+### Creating New Setups
+
+1. Create a new directory in `docker-setups/`:
+   ```bash
+   mkdir docker-setups/my-setup
+   ```
+
+2. Create a `docker-compose.yml` file:
+   ```bash
+   touch docker-setups/my-setup/docker-compose.yml
+   ```
+
+3. Define your services in the docker-compose file. You can reference projects from the `projects/` directory using relative paths:
+   ```yaml
+   services:
+     app:
+       build: ../../projects/my-project
+       volumes:
+         - ../../projects/my-project:/app
+   ```
+
+4. Start your setup:
+   ```bash
+   make up my-setup
+   ```
+
+---
+
 ## Environment Configuration
 
 - **.env:** Define environment-specific variables in this file. It will be automatically loaded when running the container.
@@ -223,6 +298,10 @@ CMD ["/bin/bash"]
 - **purge**: Purge all Docker containers and images related to the project.
 - **setup**: Set up project symlinks.
 - **link**: Create a symlink for a specific project.
+- **up**: Start all containers defined in a Docker Compose setup.
+- **down**: Stop and remove all containers defined in a Docker Compose setup.
+- **tap**: Access an interactive shell in a running container.
+- **taplog**: View live logs of a running container.
 
 ### Project-Specific Targets
 
