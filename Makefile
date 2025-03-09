@@ -1,5 +1,6 @@
-# List of “primary” targets that do not refer to a project name
-PRIMARY_TARGETS := build rebuild shell start stop logs test lint clean_volumes init purge setup link up down tap taplog
+# List of "primary" targets that do not refer to a project name
+PRIMARY_TARGETS := build rebuild shell start stop logs test lint clean_volumes init purge setup link up down tap taplog 
+NO_PROJECT_TARGETS := list-running-containers help
 
 # Set the CODE_DIR to the parent directory. This assumes that all the projects are in the same parent directory.
 CODE_DIR := $(shell dirname $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST)))))
@@ -19,8 +20,10 @@ ifneq ($(findstring -,$(firstword $(MAKECMDGOALS))),)
   PROJECT := $(subst $(firstword $(subst -, ,$(firstword $(MAKECMDGOALS))))-,,$(firstword $(MAKECMDGOALS)))
 endif
 
-# Ensure PROJECT is set
-ifneq ($(PROJECT),)
+# Ensure PROJECT is set for targets that require it
+ifneq ($(filter $(firstword $(MAKECMDGOALS)),$(NO_PROJECT_TARGETS)),)
+  # No project needed for these targets
+else ifneq ($(PROJECT),)
   PROJECT_DIR=$(DEVENV_PATH)/projects/$(PROJECT)
 else
   $(error PROJECT is not set. Please provide a project name as the second argument.)
@@ -196,7 +199,7 @@ up:
 		exit 1; \
 	fi; \
 	echo "==> Starting docker-compose setup '$$SETUP_NAME'"; \
-	docker-compose -f $$COMPOSE_FILE up -d
+	docker-compose -f $$COMPOSE_FILE up -d --remove-orphans
 	
 ### Run docker-compose down for a specific setup
 down:
@@ -212,6 +215,30 @@ down:
 	fi; \
 	echo "==> Stopping docker-compose setup '$$SETUP_NAME'"; \
 	docker-compose -f $$COMPOSE_FILE down
+
+### List running containers
+list-running-containers:
+	@echo "==> Listing all running containers across docker-compose setups"
+	@find $(DEVENV_PATH)/docker-setups -type f -name "docker-compose.yml" -execdir bash -c ' \
+		project_name=$$(basename "$$(pwd)"); \
+		output=$$(docker compose ps --quiet --filter "status=running" 2>/dev/null); \
+		if [ -n "$$output" ]; then \
+			echo ""; \
+			header_line=""; \
+			for i in $$(seq 1 $$(expr $${#project_name} + 4)); do \
+				header_line="$$header_line#"; \
+			done; \
+			echo "$$header_line"; \
+			echo "# $$project_name #"; \
+			echo "$$header_line"; \
+			printf "\n"; \
+			docker compose ps --filter "status=running" 2>/dev/null | grep -v "^WARN\\|^env file"; \
+			printf "\n"; \
+			echo "---"; \
+		fi \
+	' \;
+	@echo ""
+	@echo "==> For other containers, use 'docker ps'"
 
 ### Connect to a running container
 tap:
@@ -240,6 +267,45 @@ taplog:
 	fi; \
 	echo "==> Viewing logs for container '$$CONTAINER_NAME'"; \
 	docker logs -f $$CONTAINER_NAME
+
+### Display help information about available make commands
+help:
+	@echo "Devenv - Docker-based Development Environment"
+	@echo ""
+	@echo "Usage: make [target] [project]"
+	@echo ""
+	@echo "Project Management:"
+	@echo "  init [project]              Initialize a new project structure"
+	@echo "  setup                       Set up project symlinks for all projects"
+	@echo "  link [project] path=PATH    Create a symlink for a specific project"
+	@echo ""
+	@echo "Docker Image Management:"
+	@echo "  build [project]             Build the project's Docker images"
+	@echo "  rebuild [project]           Rebuild the project's Docker images without cache"
+	@echo "  purge [project]             Purge all Docker containers and images for a project"
+	@echo ""
+	@echo "Container Management:"
+	@echo "  start [project]             Start the project's container in detached mode"
+	@echo "  stop [project]              Stop the running container for the project"
+	@echo "  shell [project]             Run an interactive shell in the project's container"
+	@echo "  logs [project]              View logs from the running container"
+	@echo "  clean_volumes [project]     Clean up named volumes associated with the project"
+	@echo ""
+	@echo "Development Tasks:"
+	@echo "  test [project]              Run tests inside the project's container"
+	@echo "  lint [project]              Run linter inside the project's container"
+	@echo ""
+	@echo "Docker Compose Setups:"
+	@echo "  up [setup-name]             Start all containers in a Docker Compose setup"
+	@echo "  down [setup-name]           Stop and remove all containers in a Docker Compose setup"
+	@echo "  list-running-containers     List all running containers across docker-compose setups"
+	@echo ""
+	@echo "Container Interaction:"
+	@echo "  tap [container-name]        Access an interactive shell in a running container"
+	@echo "  taplog [container-name]     View live logs of a running container"
+	@echo ""
+	@echo "Help:"
+	@echo "  help                        Display this help message"
 
 # Make catch-all rule to handle the setup name argument
 %:

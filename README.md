@@ -43,6 +43,16 @@ This setup reflects my personal development workflow and is tailored toward my p
 
 ## Getting Started
 
+### Getting Help
+
+To see all available commands with descriptions:
+
+```bash
+make help
+```
+
+This will display a list of all available commands, organized by category, with a brief description of each.
+
 ### 1. Initialize a New Project
 
 Create a new project structure with all necessary files and folders:
@@ -69,7 +79,7 @@ make link new-app path=/path/to/new-app
 
 ### 3. Build the Project
 
-Build the project’s base and development Docker images:
+Build the project's base and development Docker images:
 
 ```bash
 make build new-app
@@ -112,7 +122,7 @@ make logs new-app
 
 ### 8. Stop the Project
 
-Stop the running container gracefully using the project’s `scripts/stop.sh` script:
+Stop the running container gracefully using the project's `scripts/stop.sh` script:
 
 ```bash
 make stop new-app
@@ -165,6 +175,12 @@ make down setup-name
 This command stops and removes all containers defined in the setup's docker-compose file, but preserves volumes.
 
 ### Container Interaction Commands
+
+#### Listing Running Containers
+```bash
+make list-running-containers
+```
+Shows all running containers across all docker-compose setups in the `docker-setups/` directory. This provides a quick overview of which compose setups are active and what containers are running within them.
 
 #### Accessing Container Shell
 ```bash
@@ -310,8 +326,10 @@ CMD ["/bin/bash"]
 - **link**: Create a symlink for a specific project.
 - **up**: Start all containers defined in a Docker Compose setup.
 - **down**: Stop and remove all containers defined in a Docker Compose setup.
+- **list-running-containers**: List all running containers of all docker-compose setups in the docker-setups folder.
 - **tap**: Access an interactive shell in a running container.
 - **taplog**: View live logs of a running container.
+- **help**: Display help information about available make commands.
 
 ---
 
